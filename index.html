@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget Catcher</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="hero-header">
+      <h1 class="main-title">
+        💰 Budget Catcher
+      </h1>
+    </div>
+
+    <!-- Google Login -->
+    <div class="text-center">
+
+      <div class="g-signin-btn" id="googleSignIn">
+
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+
+        Sign in with Google
+
+      </div>
+
+    </div>
+
+    <!-- FORM -->
+
+    <div class="form-wrapper">
+
+      <form id="donationForm">
+
+        <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-4">
+
+          <!-- TYPE -->
+
+          <div class="form-group">
+
+            <select name="type" required>
+
+              <option value="" disabled selected hidden></option>
+
+              <option value="Collection">Collection</option>
+
+              <option value="Expense">Expense</option>
+
+            </select>
+
+            <label>Type</label>
+
+          </div>
+
+          <!-- NAME -->
+
+          <div class="form-group">
+
+            <input type="text" name="name" placeholder=" " required>
+
+            <label>Name</label>
+
+          </div>
+
+          <!-- AMOUNT -->
+
+          <div class="form-group">
+
+            <input type="number" name="amount" id="amount" placeholder=" " required>
+
+            <label>Amount</label>
+
+          </div>
+
+          <!-- LOCAL -->
+
+          <div class="form-group">
+
+            <input type="text" name="local" placeholder=" " required>
+
+            <label>Local</label>
+
+          </div>
+
+          <!-- VILLAGE -->
+
+          <div class="form-group">
+
+            <input type="text" name="village" placeholder=" " required>
+
+            <label>Village</label>
+
+          </div>
+
+          <!-- FESTIVAL -->
+
+          <div class="form-group">
+
+            <select name="festival" required>
+
+              <option value="" disabled selected hidden></option>
+
+              <option>15th Aug</option>
+              <option>Durga Puja</option>
+              <option>Diwali</option>
+              <option>Holi</option>
+              <option>Navratri</option>
+              <option>Raksha Bandhan</option>
+              <option>Janmashtami</option>
+              <option>Ganesh Chaturthi</option>
+              <option>Makar Sankranti</option>
+
+            </select>
+
+            <label>Festival</label>
+
+          </div>
+
+          <!-- YEAR -->
+
+          <div class="form-group">
+
+            <input type="number" id="year" name="year" placeholder=" " min="2024" max="2100" required>
+
+            <label>Year</label>
+
+          </div>
+
+          <!-- REMARK -->
+
+          <div class="form-group">
+
+            <input type="text" name="remarks" placeholder=" ">
+
+            <label>Remarks</label>
+
+          </div>
+
+          <!-- ATTACHMENT -->
+          <div class="form-group">
+            <input type="file" id="attachment" name="attachment"
+              accept="image/jpeg,image/png,image/jpg,application/pdf">
+
+            <label>Attachment</label>
+
+            <small id="fileInfo"></small>
+          </div>
+
+        </div>
+
+        <input type="hidden" name="submittedBy" id="submittedBy">
+
+        <button type="submit">
+
+          Save
+
+        </button>
+
+      </form>
+
+    </div>
+
+    <!-- FILTERS -->
+
+    <div class="search-filters">
+
+      <input type="text" id="searchByName" placeholder="Search Name">
+
+      <select id="searchByAmountRange">
+
+        <option value="">Amount</option>
+
+        <option value="10-100">₹10 - ₹100</option>
+
+        <option value="100-500">₹100 - ₹500</option>
+
+        <option value="500-1000">₹500 - ₹1000</option>
+
+        <option value="1000-2000">₹1000 - ₹2000</option>
+
+        <option value="2000-5000">₹2000 - ₹5000</option>
+
+        <option value="5000-10000">₹5000 - ₹10000</option>
+
+        <option value="10000+">₹10000+</option>
+
+      </select>
+
+      <select id="searchByVillage">
+
+        <option value="">Village</option>
+
+      </select>
+
+      <select id="searchByYear">
+
+        <option value="">Year</option>
+
+      </select>
+
+      <select id="searchByLocal">
+
+        <option value="">Local</option>
+
+      </select>
+
+      <select id="searchByFestival">
+
+        <option value="">Festival</option>
+
+      </select>
+
+      <input type="text" id="searchBySubmittedBy" placeholder="Submitted By">
+
+      <button id="loadDataBtn">
+
+        Load Data
+
+      </button>
+
+    </div>
+
+    <!-- TABLE -->
+
+    <div id="exportContent">
+
+      <div class="table-wrapper">
+
+        <table id="dataTable">
+
+          <thead>
+
+            <tr>
+
+              <th>Timestamp</th>
+
+              <th>Type</th>
+
+              <th>Name</th>
+
+              <th>Amount</th>
+
+              <th>Local</th>
+
+              <th>Village</th>
+
+              <th>Festival</th>
+
+              <th>Year</th>
+
+              <th>Remarks</th>
+
+              <th>Attachment</th>
+
+              <th>Submitted By</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+    <div id="totalAmountBox" class="total-amount-box">
+
+      Total Amount :
+
+      ₹
+
+      <span id="totalAmount">
+
+        0
+
+      </span>
+
+    </div>
+
+    <button id="downloadPDF" class="export-btn">
+
+      Export PDF
+
+    </button>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script src="script.js"></script>
+
+</body>
+
+</html>

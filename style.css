@@ -1,0 +1,287 @@
+/* === Global Styling Based on Canva Design === */
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.main-title {
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: float 3s ease-in-out infinite;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.g-signin-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  background: white;
+  color: #333;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 0 auto 2rem;
+  cursor: pointer;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.g-signin-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.g-signin-btn img {
+  height: 20px;
+}
+
+/* === Glass Card Form === */
+.form-wrapper {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  margin-bottom: 3rem;
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #4ecdc4;
+  outline: none;
+  box-shadow: 0 0 12px rgba(78, 205, 196, 0.3);
+}
+
+.form-group label {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  background: rgba(102, 126, 234, 0.8);
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.9rem;
+  pointer-events: none;
+  transition: 0.3s ease;
+  opacity: 0.7;
+}
+
+.form-group input:not(:placeholder-shown)+label,
+.form-group input:focus+label,
+.form-group select:focus+label,
+.form-group select:valid+label {
+  top: -10px;
+  left: 12px;
+  font-size: 0.75rem;
+  opacity: 1;
+}
+
+button[type="submit"] {
+  width: 100%;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  padding: 1rem;
+  color: white;
+  font-weight: 700;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  margin-top: 1rem;
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* === Filter Section === */
+.search-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1rem;
+  backdrop-filter: blur(6px);
+  margin-bottom: 2rem;
+}
+
+.search-filters input,
+.search-filters select {
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.search-filters select option {
+  background-color: #1f2937;
+  color: #fff;
+}
+
+#loadDataBtn {
+  background: #10b981;
+  color: white;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+#loadDataBtn:hover {
+  background: #059669;
+}
+
+/* === Table Styling === */
+.table-wrapper {
+  overflow-x: auto;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+#dataTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+  color: white;
+  table-layout: auto;
+}
+
+#dataTable th,
+#dataTable td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: normal;
+  min-width: 80px;
+}
+
+#dataTable td:nth-child(8) {
+  /* Year column */
+  min-width: 60px;
+  text-align: center;
+}
+
+#dataTable td:nth-child(3) {
+  /* Amount column */
+  min-width: 80px;
+  text-align: center;
+}
+
+thead {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* === Total Amount === */
+.total-amount-box {
+  background: #fef08a;
+  color: #92400e;
+  font-weight: bold;
+  font-size: 1.5rem;
+  padding: 1rem;
+  text-align: center;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* === Export Button === */
+.export-btn {
+  background: #6366f1;
+  color: white;
+  font-weight: bold;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background 0.3s;
+  display: block;
+  margin: 2rem auto 0;
+}
+
+.export-btn:hover {
+  background: #4f46e5;
+}
+
+/* === Responsive === */
+@media screen and (max-width: 768px) {
+  .main-title {
+    font-size: 2rem;
+  }
+
+  .form-wrapper,
+  .table-wrapper,
+  .search-filters {
+    padding: 1rem;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+}
+
+.form-group select option {
+  background-color: #1f2937;
+  /* Tailwind gray-800 */
+  color: #fff;
+}
