@@ -12,7 +12,100 @@ function handleCredentialResponse(response) {
 
 document.getElementById("year").value = new Date().getFullYear();
 
-window.onload = function () {
+// Form Visibility Logic
+document.addEventListener('DOMContentLoaded', function () {
+  const festivalEl = document.getElementById('festival');
+  const typeEl = document.getElementById('type');
+  const paymentTypeEl = document.getElementById('paymentType');
+
+  const fgType = document.getElementById('fg-type');
+  const fgName = document.getElementById('fg-name');
+  const fgAmount = document.getElementById('fg-amount');
+  const fgLocal = document.getElementById('fg-local');
+  const fgVillage = document.getElementById('fg-village');
+  const fgYear = document.getElementById('fg-year');
+  const fgRemarks = document.getElementById('fg-remarks');
+  const fgPaymentType = document.getElementById('fg-paymentType');
+  const fgAttachment = document.getElementById('fg-attachment');
+
+  const lblName = document.getElementById('lbl-name');
+  const lblLocal = document.getElementById('lbl-local');
+
+  function updateFormVisibility() {
+    const festival = festivalEl.value;
+    const type = typeEl.value;
+    const paymentType = paymentTypeEl.value;
+
+    if (festival) {
+      fgType.style.display = 'block';
+      typeEl.required = true;
+    } else {
+      fgType.style.display = 'none';
+      typeEl.required = false;
+    }
+
+    if (type === 'Expense' || type === 'Collection') {
+      if (type === 'Expense') {
+        fgName.style.display = 'block';
+        lblName.textContent = 'Product Name';
+        document.getElementById('name').required = true;
+
+        fgAmount.style.display = 'block';
+
+        fgLocal.style.display = 'block';
+        lblLocal.textContent = 'Shop Name';
+        document.getElementById('local').required = true;
+
+        fgVillage.style.display = 'none';
+        document.getElementById('village').required = false;
+        document.getElementById('village').value = '';
+      } else {
+        // Collection
+        fgName.style.display = 'block';
+        lblName.textContent = 'Name';
+        document.getElementById('name').required = true;
+
+        fgAmount.style.display = 'block';
+
+        fgLocal.style.display = 'block';
+        lblLocal.textContent = 'Local';
+        document.getElementById('local').required = true;
+
+        fgVillage.style.display = 'block';
+        document.getElementById('village').required = true;
+      }
+
+      fgYear.style.display = 'block';
+      fgRemarks.style.display = 'block';
+
+      fgPaymentType.style.display = 'block';
+      paymentTypeEl.required = true;
+
+      if (paymentType === 'Online') {
+        fgAttachment.style.display = 'block';
+      } else {
+        fgAttachment.style.display = 'none';
+        document.getElementById('attachment').value = '';
+        document.getElementById('fileInfo').innerHTML = '';
+      }
+    } else {
+      [fgName, fgAmount, fgLocal, fgVillage, fgYear, fgRemarks, fgPaymentType, fgAttachment].forEach(el => el.style.display = 'none');
+      document.getElementById('village').required = false;
+      document.getElementById('name').required = false;
+      document.getElementById('local').required = false;
+      paymentTypeEl.required = false;
+      document.getElementById('attachment').value = '';
+      document.getElementById('fileInfo').innerHTML = '';
+    }
+  }
+
+  festivalEl.addEventListener('change', updateFormVisibility);
+  typeEl.addEventListener('change', updateFormVisibility);
+  paymentTypeEl.addEventListener('change', updateFormVisibility);
+
+  // Initial check
+  updateFormVisibility();
+}); window.onload = function () {
   google.accounts.id.initialize({
     client_id:
       "923748239564-vu6bjumjpfa36jt3rsvjtnrnh637m6a0.apps.googleusercontent.com",
@@ -141,15 +234,17 @@ function renderTable(data) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td style="white-space: nowrap;">${row.Timestamp || ""}</td>
+      <td>${row.type || ""}</td>
+      <td>${row.paymentType || ""}</td>
       <td>${row.name || ""}</td>
       <td>${row.amount || ""}</td>
       <td>${row.local || ""}</td>
       <td>${row.village || ""}</td>
       <td>${row.festival || ""}</td>
-      <td>${row.remarks || ""}</td>
       <td>${row.year || ""}</td>
+      <td>${row.remarks || ""}</td>
+      <td>${row.attachment ? `<a href="${row.attachment}" target="_blank" style="color: blue; text-decoration: underline;">View</a>` : ""}</td>
       <td>${row.submittedBy || ""}</td>
-    
     `;
     tbody.appendChild(tr);
   });
@@ -170,6 +265,8 @@ function applyFilters() {
     .getElementById("searchBySubmittedBy")
     .value.trim()
     .toLowerCase();
+  const typeInput = document.getElementById("searchByType")?.value || "";
+  const paymentTypeInput = document.getElementById("searchByPaymentType")?.value || "";
   const amountRange = document.getElementById("searchByAmountRange")?.value || "";
 
   const filtered = allData.filter((row) => {
@@ -180,6 +277,8 @@ function applyFilters() {
     const festival = String(row.festival || "");
     const submittedBy = String(row.submittedBy || "").toLowerCase();
     const amt = parseFloat(row.amount || "0");
+    const rowType = String(row.type || "");
+    const rowPaymentType = String(row.paymentType || "");
 
     const matchesAmount = (() => {
       if (!amountRange) return true;
@@ -203,6 +302,8 @@ function applyFilters() {
       (!yearInput || year === yearInput) &&
       (!localInput || local === localInput) &&
       (!festivalInput || festival === festivalInput) &&
+      (!typeInput || rowType === typeInput) &&
+      (!paymentTypeInput || rowPaymentType === paymentTypeInput) &&
       (!submittedByInput || submittedBy.includes(submittedByInput)) &&
       matchesAmount
     );

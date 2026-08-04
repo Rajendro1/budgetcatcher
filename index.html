@@ -39,72 +39,10 @@
 
         <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-4">
 
-          <!-- TYPE -->
-
-          <div class="form-group">
-
-            <select name="type" required>
-
-              <option value="" disabled selected hidden></option>
-
-              <option value="Collection">Collection</option>
-
-              <option value="Expense">Expense</option>
-
-            </select>
-
-            <label>Type</label>
-
-          </div>
-
-          <!-- NAME -->
-
-          <div class="form-group">
-
-            <input type="text" name="name" placeholder=" " required>
-
-            <label>Name</label>
-
-          </div>
-
-          <!-- AMOUNT -->
-
-          <div class="form-group">
-
-            <input type="number" name="amount" id="amount" placeholder=" " required>
-
-            <label>Amount</label>
-
-          </div>
-
-          <!-- LOCAL -->
-
-          <div class="form-group">
-
-            <input type="text" name="local" placeholder=" " required>
-
-            <label>Local</label>
-
-          </div>
-
-          <!-- VILLAGE -->
-
-          <div class="form-group">
-
-            <input type="text" name="village" placeholder=" " required>
-
-            <label>Village</label>
-
-          </div>
-
           <!-- FESTIVAL -->
-
-          <div class="form-group">
-
-            <select name="festival" required>
-
+          <div class="form-group" id="fg-festival">
+            <select name="festival" id="festival" required>
               <option value="" disabled selected hidden></option>
-
               <option>15th Aug</option>
               <option>Durga Puja</option>
               <option>Ras Yatra</option>
@@ -113,40 +51,72 @@
               <option>Horinam Song Kirton </option>
               <option>Bonbibi pooja (Mamun) </option>
               <option>Chorok </option>
-
             </select>
-
             <label>Festival</label>
+          </div>
 
+          <!-- TYPE -->
+          <div class="form-group" id="fg-type" style="display: none;">
+            <select name="type" id="type">
+              <option value="" disabled selected hidden></option>
+              <option value="Collection">Collection</option>
+              <option value="Expense">Expense</option>
+            </select>
+            <label>Type</label>
+          </div>
+
+          <!-- NAME -->
+          <div class="form-group" id="fg-name" style="display: none;">
+            <input type="text" name="name" id="name" placeholder=" " required>
+            <label id="lbl-name">Name</label>
+          </div>
+
+          <!-- AMOUNT -->
+          <div class="form-group" id="fg-amount" style="display: none;">
+            <input type="number" name="amount" id="amount" placeholder=" " required>
+            <label>Amount</label>
+          </div>
+
+          <!-- LOCAL -->
+          <div class="form-group" id="fg-local" style="display: none;">
+            <input type="text" name="local" id="local" placeholder=" " required>
+            <label id="lbl-local">Local</label>
+          </div>
+
+          <!-- VILLAGE -->
+          <div class="form-group" id="fg-village" style="display: none;">
+            <input type="text" name="village" id="village" placeholder=" ">
+            <label>Village</label>
           </div>
 
           <!-- YEAR -->
-
-          <div class="form-group">
-
+          <div class="form-group" id="fg-year" style="display: none;">
             <input type="number" id="year" name="year" placeholder=" " min="2024" max="2100" required>
-
             <label>Year</label>
-
           </div>
 
           <!-- REMARK -->
-
-          <div class="form-group">
-
-            <input type="text" name="remarks" placeholder=" ">
-
+          <div class="form-group" id="fg-remarks" style="display: none;">
+            <input type="text" name="remarks" id="remarks" placeholder=" ">
             <label>Remarks</label>
+          </div>
 
+          <!-- PAYMENT TYPE -->
+          <div class="form-group" id="fg-paymentType" style="display: none;">
+            <select name="paymentType" id="paymentType">
+              <option value="" disabled selected hidden></option>
+              <option value="Cash">Cash</option>
+              <option value="Online">Online</option>
+              <option value="Later Pay">Later Pay</option>
+            </select>
+            <label>Payment Type</label>
           </div>
 
           <!-- ATTACHMENT -->
-          <div class="form-group">
+          <div class="form-group" id="fg-attachment" style="display: none;">
             <input type="file" id="attachment" name="attachment"
               accept="image/jpeg,image/png,image/jpg,application/pdf">
-
             <label>Attachment</label>
-
             <small id="fileInfo"></small>
           </div>
 
@@ -169,6 +139,19 @@
     <div class="search-filters">
 
       <input type="text" id="searchByName" placeholder="Search Name">
+
+      <select id="searchByType">
+        <option value="">Type</option>
+        <option value="Expense">Expense</option>
+        <option value="Collection">Collection</option>
+      </select>
+
+      <select id="searchByPaymentType">
+        <option value="">Payment Type</option>
+        <option value="Cash">Cash</option>
+        <option value="Online">Online</option>
+        <option value="Later Pay">Later Pay</option>
+      </select>
 
       <select id="searchByAmountRange">
 
@@ -239,6 +222,8 @@
               <th>Timestamp</th>
 
               <th>Type</th>
+
+              <th>Payment Type</th>
 
               <th>Name</th>
 

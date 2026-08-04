@@ -15,6 +15,7 @@ function doPost(e) {
 const expectedHeaders = [
   "Timestamp",
   "type",
+  "paymentType",
   "year",
   "village",
   "festival",
@@ -94,29 +95,18 @@ function uploadAttachment(data) {
 
     // Prepare row
 const row = [
-
   new Date(),
-
   data.type || "",
-
+  data.paymentType || "",
   data.year || "",
-
   data.village || "",
-
   data.festival || "",
-
   data.remarks || "",
-
   data.local || "",
-
   data.name || "",
-
   data.amount || "",
-
   attachmentUrl,
-
   data.submittedBy || ""
-
 ];
 
     sheet.appendRow(row);
@@ -150,10 +140,9 @@ function readSheetData() {
 
   const combinedData = [];
 const expectedHeaders = [
-
   "Timestamp",
-
   "type",
+  "paymentType",
 
   "year",
 
