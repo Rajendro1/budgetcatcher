@@ -232,16 +232,64 @@ tbody tr:hover {
   background-color: rgba(255, 255, 255, 0.08);
 }
 
-/* === Total Amount === */
+/* === Total Amount Summary === */
 .total-amount-box {
-  background: #fef08a;
-  color: #92400e;
-  font-weight: bold;
-  font-size: 1.5rem;
-  padding: 1rem;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1rem 1.5rem;
   border-radius: 1rem;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  min-width: 140px;
+  transition: transform 0.2s ease;
+}
+
+.summary-item:hover {
+  transform: translateY(-2px);
+}
+
+.collection-box {
+  background: linear-gradient(135deg, #1e3a5f, #1d4ed8);
+  color: #fff;
+}
+
+.expense-box {
+  background: linear-gradient(135deg, #4a1942, #7e22ce);
+  color: #fff;
+}
+
+.balance-box {
+  background: linear-gradient(135deg, #1a3a2a, #15803d);
+  color: #fff;
+}
+
+.summary-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.9;
+  letter-spacing: 0.05em;
+}
+
+.summary-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.summary-divider {
+  font-size: 2rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  align-self: center;
 }
 
 /* === Export Button === */

@@ -258,17 +258,20 @@
     </div>
 
     <div id="totalAmountBox" class="total-amount-box">
-
-      Total Amount :
-
-      ₹
-
-      <span id="totalAmount">
-
-        0
-
-      </span>
-
+      <div class="summary-item collection-box">
+        <span class="summary-label">📥 Collection</span>
+        <span class="summary-value">₹<span id="totalCollection">0</span></span>
+      </div>
+      <div class="summary-divider">−</div>
+      <div class="summary-item expense-box">
+        <span class="summary-label">📤 Expense</span>
+        <span class="summary-value">₹<span id="totalExpense">0</span></span>
+      </div>
+      <div class="summary-divider">=</div>
+      <div class="summary-item balance-box" id="balanceBox">
+        <span class="summary-label" id="balanceLabel">💰 Balance</span>
+        <span class="summary-value" id="totalBalance">₹0</span>
+      </div>
     </div>
 
     <button id="downloadPDF" class="export-btn">

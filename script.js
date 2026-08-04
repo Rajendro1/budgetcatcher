@@ -311,13 +311,48 @@ function applyFilters() {
 
   renderTable(filtered);
 
-  // ✅ Show total amount
-  const total = filtered.reduce((sum, row) => {
-    const amt = parseFloat(row.amount);
-    return !isNaN(amt) ? sum + amt : sum;
-  }, 0);
+  // ✅ Show collection, expense and balance
+  let totalCollection = 0;
+  let totalExpense = 0;
 
-  document.getElementById("totalAmount").textContent = total.toFixed(2);
+  filtered.forEach(row => {
+    const amt = parseFloat(row.amount);
+    if (isNaN(amt)) return;
+    const rowType = String(row.type || '').toLowerCase();
+    if (rowType === 'collection') {
+      totalCollection += amt;
+    } else if (rowType === 'expense') {
+      totalExpense += amt;
+    }
+  });
+
+  const balance = totalCollection - totalExpense;
+
+  document.getElementById('totalCollection').textContent = totalCollection.toFixed(2);
+  document.getElementById('totalExpense').textContent = totalExpense.toFixed(2);
+
+  const balanceEl = document.getElementById('totalBalance');
+  const balanceLabelEl = document.getElementById('balanceLabel');
+  const balanceBox = document.getElementById('balanceBox');
+
+  balanceEl.textContent = '₹' + Math.abs(balance).toFixed(2);
+
+  if (balance > 0) {
+    balanceLabelEl.textContent = '🟢 Profit';
+    balanceBox.style.background = 'linear-gradient(135deg, #166534, #15803d)';
+    balanceBox.style.color = '#fff';
+    balanceEl.style.color = '#bbf7d0';
+  } else if (balance < 0) {
+    balanceLabelEl.textContent = '🔴 Loss';
+    balanceBox.style.background = 'linear-gradient(135deg, #7f1d1d, #b91c1c)';
+    balanceBox.style.color = '#fff';
+    balanceEl.style.color = '#fecaca';
+  } else {
+    balanceLabelEl.textContent = '💰 Balance';
+    balanceBox.style.background = '';
+    balanceBox.style.color = '';
+    balanceEl.style.color = '';
+  }
 }
 
 
@@ -363,17 +398,33 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
     });
   }
 
-  // Append total amount to bottom
-  const totalBox = document.getElementById("totalAmountBox").cloneNode(true);
-  totalBox.style.background = "#fef08a";
-  totalBox.style.color = "#92400e";
-  totalBox.style.fontWeight = "bold";
-  totalBox.style.fontSize = "14px";
-  totalBox.style.textAlign = "center";
-  totalBox.style.marginTop = "20px";
-  totalBox.style.padding = "10px";
-  totalBox.style.borderRadius = "10px";
-  clone.appendChild(totalBox);
+  // Append summary boxes to bottom of PDF
+  const collectionVal = document.getElementById('totalCollection').textContent;
+  const expenseVal = document.getElementById('totalExpense').textContent;
+  const balanceVal = document.getElementById('totalBalance').textContent;
+  const balanceLabel = document.getElementById('balanceLabel').textContent;
+  const isLoss = balanceLabel.includes('Loss');
+  const isProfit = balanceLabel.includes('Profit');
+
+  const summaryDiv = document.createElement('div');
+  summaryDiv.style.cssText = 'display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px;';
+  summaryDiv.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1e3a5f,#1d4ed8);color:#fff;padding:10px 20px;border-radius:10px;text-align:center;min-width:120px;">
+      <div style="font-size:11px;font-weight:600;opacity:0.9;">📥 Collection</div>
+      <div style="font-size:16px;font-weight:700;">₹${collectionVal}</div>
+    </div>
+    <div style="font-size:24px;font-weight:700;color:#555;align-self:center;">−</div>
+    <div style="background:linear-gradient(135deg,#4a1942,#7e22ce);color:#fff;padding:10px 20px;border-radius:10px;text-align:center;min-width:120px;">
+      <div style="font-size:11px;font-weight:600;opacity:0.9;">📤 Expense</div>
+      <div style="font-size:16px;font-weight:700;">₹${expenseVal}</div>
+    </div>
+    <div style="font-size:24px;font-weight:700;color:#555;align-self:center;">=</div>
+    <div style="background:${isProfit ? 'linear-gradient(135deg,#166534,#15803d)' : isLoss ? 'linear-gradient(135deg,#7f1d1d,#b91c1c)' : 'linear-gradient(135deg,#1a3a2a,#15803d)'};color:#fff;padding:10px 20px;border-radius:10px;text-align:center;min-width:120px;">
+      <div style="font-size:11px;font-weight:600;opacity:0.9;">${balanceLabel}</div>
+      <div style="font-size:16px;font-weight:700;">${balanceVal}</div>
+    </div>
+  `;
+  clone.appendChild(summaryDiv);
 
   // Create a temp container
   const tempContainer = document.createElement("div");
