@@ -168,7 +168,7 @@ const expectedHeaders = [
     if (data.length < 2) continue; // skip if only header or empty
 
     const headers = data[0];
-    if (headers.join() !== expectedHeaders.join()) continue; // skip if header structure doesn't match
+    if (!headers.includes("Timestamp")) continue; // Only skip if it doesn't look like a valid data sheet
 
     for (let i = 1; i < data.length; i++) {
       const row = data[i];

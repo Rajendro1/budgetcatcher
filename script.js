@@ -1,7 +1,7 @@
 let signedInEmail = "";
 
 const scriptURL =
-  "https://script.google.com/macros/s/AKfycbwOJTOCV_nNfsQ5-xYn-ESU30PIyJckQnmmSU8omhyt2GmBWGqYQSNvNTLTO9-Ozv6j3A/exec";
+  "https://script.google.com/macros/s/AKfycbxd8lhscg78qUJMhoEebUY3YDQMsDEj2RuzBOyVrykJ1rEGKVSuhbZABsdINnk0v1ye3w/exec";
 
 function handleCredentialResponse(response) {
   const data = jwt_decode(response.credential);
