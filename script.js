@@ -410,6 +410,10 @@ function applyFilters() {
     document.getElementById("searchByLocal").value
   );
 
+  const shopNameInput = normalizeFilterValue(
+    document.getElementById("searchByShopName").value
+  );
+
   const festivalInput = normalizeFilterValue(
     document.getElementById("searchByFestival").value
   );
@@ -451,6 +455,8 @@ function applyFilters() {
     const local = normalizeFilterValue(
       row.local
     );
+    
+    const shopName = normalizeFilterValue(row.local);
 
     const festival = normalizeFilterValue(
       row.festival
@@ -515,6 +521,12 @@ function applyFilters() {
 
       (!localInput ||
         local === localInput) &&
+
+      (!shopNameInput ||
+        (
+          normalizeFilterValue(row.type) === "expense" &&
+          shopName === shopNameInput
+        )) &&
 
       (!festivalInput ||
         festival === festivalInput) &&
@@ -696,29 +708,32 @@ function getUniqueValues(data, field) {
 }
 
 function populateDropdowns(data) {
-  const villages =
-    getUniqueValues(
-      data,
-      "village"
-    );
+  const villages = getUniqueValues(data, "village");
 
-  const years =
-    getUniqueValues(
-      data,
-      "year"
-    );
+  const years = getUniqueValues(data, "year");
 
-  const locals =
-    getUniqueValues(
-      data,
-      "local"
-    );
+  // Local = only Collection records
+  const locals = getUniqueValues(
+    data.filter(
+      row =>
+        normalizeFilterValue(row.type) === "collection"
+    ),
+    "local"
+  );
 
-  const festivals =
-    getUniqueValues(
-      data,
-      "festival"
-    );
+  // Shop Name = only Expense records
+  const shopNames = getUniqueValues(
+    data.filter(
+      row =>
+        normalizeFilterValue(row.type) === "expense"
+    ),
+    "local"
+  );
+
+  const festivals = getUniqueValues(
+    data,
+    "festival"
+  );
 
   fillSelect(
     "searchByVillage",
@@ -733,6 +748,11 @@ function populateDropdowns(data) {
   fillSelect(
     "searchByLocal",
     locals
+  );
+
+  fillSelect(
+    "searchByShopName",
+    shopNames
   );
 
   fillSelect(
@@ -762,6 +782,10 @@ function fillSelect(id, values) {
 
     case "searchByLocal":
       label = "Select Local";
+      break;
+
+    case "searchByShopName":
+      label = "Select Shop Name";
       break;
 
     case "searchByFestival":
