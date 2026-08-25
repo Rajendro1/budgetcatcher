@@ -1072,49 +1072,71 @@ document
     // CREATE WHATSAPP MESSAGE
     // =================================================
 
+    function getBengaliFestival(festival) {
+      switch (normalizeFilterValue(festival)) {
+        case "15th aug":
+          return "১৫ই আগস্ট";
+
+        case "durga puja":
+          return "দুর্গাপূজা";
+
+        case "ras yatra":
+          return "রাসযাত্রা";
+
+        case "saraswathi pooja":
+          return "সরস্বতী পূজা";
+
+        case "holi":
+          return "দোলযাত্রা";
+
+        case "horinam song kirton":
+          return "হরিনাম সংকীর্তন";
+
+        case "bonbibi pooja (mamun)":
+          return "বনবিবি পূজা";
+
+        case "chorok":
+          return "চড়ক";
+
+        default:
+          return festival || "উৎসব";
+      }
+    }
+
     let message = "";
 
-    message += "🙏 *FESTIVAL BUDGET REPORT* 🙏\n";
+    const festivalName = getBengaliFestival(festival);
+
+    message += `*${festivalName} — উৎসবের হিসাব* \n`;
     message += "━━━━━━━━━━━━━━━━━━━━\n";
 
-    if (festival) {
-      message += `🎉 *Festival:* ${festival}\n`;
-    }
 
-    if (year) {
-      message += `📅 *Year:* ${year}\n`;
-    }
-
-    if (village) {
-      message += `📍 *Village:* ${village}\n`;
-    }
+    message += `*উৎসব:* ${festival}\n`;
+    message += `*বছর:* ${year}\n`;
+    message += `*গ্রাম:* ${village}\n`;
 
     message += "\n";
 
-    message += "💰 *FINANCIAL SUMMARY*\n";
+    message += "*আর্থিক হিসাব*\n";
     message += "━━━━━━━━━━━━━━━━━━━━\n";
 
-    message +=
-      `📥 Collection: ₹${totalCollection.toFixed(2)}\n`;
+    message += `মোট সংগ্রহ: ₹${totalCollection.toFixed(2)}\n`;
+    message += `মোট খরচ: ₹${totalExpense.toFixed(2)}\n`;
 
     message +=
-      `📤 Expense: ₹${totalExpense.toFixed(2)}\n`;
-
-    message +=
-      `${balance >= 0 ? "🟢" : "🔴"} Balance: ₹${Math.abs(balance).toFixed(2)}\n`;
+      `${balance >= 0 ? "+" : "-"} ${balance >= 0 ? "ব্যালেন্স" : "ঘাটতি"}: ₹${Math.abs(balance).toFixed(2)}\n`;
 
     message += "\n";
 
     // =================================================
     // TRANSACTION DETAILS
     // =================================================
-
-    message += "*TRANSACTION DETAILS*\n";
+    
+    message += "*লেনদেনের বিবরণ*\n";
     message += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 
-    // Header
     message +=
-      "*Type, Name, Amount, Local, Village, Payment, Remarks*\n";
+      "*ধরন | নাম | পরিমাণ | এলাকা | গ্রাম | পেমেন্ট | মন্তব্য*\n";
 
     // Data
     data.forEach((row) => {
