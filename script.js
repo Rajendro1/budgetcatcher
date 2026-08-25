@@ -178,77 +178,169 @@ window.onload = function () {
 
   fetchData();
 };
+// =====================================================
+// DUPLICATE DATA VALIDATION
+// =====================================================
 
+function normalizeValue(value) {
+  return String(value ?? "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
+function isDuplicateSubmission(data) {
+  return allData.some((row) => {
+
+    // Compare every important field EXCEPT Timestamp
+    return (
+      normalizeValue(row.type) === normalizeValue(data.type) &&
+      normalizeValue(row.paymentType) === normalizeValue(data.paymentType) &&
+      normalizeValue(row.name) === normalizeValue(data.name) &&
+      normalizeValue(row.amount) === normalizeValue(data.amount) &&
+      normalizeValue(row.local) === normalizeValue(data.local) &&
+      normalizeValue(row.village) === normalizeValue(data.village) &&
+      normalizeValue(row.festival) === normalizeValue(data.festival) &&
+      normalizeValue(row.year) === normalizeValue(data.year) &&
+      normalizeValue(row.remarks) === normalizeValue(data.remarks) &&
+      normalizeValue(row.submittedBy) === normalizeValue(data.submittedBy)
+    );
+  });
+}
 // =====================================================
 // FORM SUBMIT
 // =====================================================
 
+let isSubmitting = false;
+
 document
   .getElementById("donationForm")
   .addEventListener("submit", async function (e) {
+
     e.preventDefault();
+
+    // Prevent multiple clicks
+    if (isSubmitting) {
+      return;
+    }
 
     if (!signedInEmail) {
       alert("⚠️ Please sign in with Google before submitting.");
       return;
     }
 
-    document.getElementById("submittedBy").value = signedInEmail;
+    const submitButton = this.querySelector('button[type="submit"]');
 
-    const formData = new FormData(this);
+    // Lock submission immediately
+    isSubmitting = true;
+    submitButton.disabled = true;
+    submitButton.textContent = "Saving...";
 
-    const jsonData = Object.fromEntries(formData.entries());
+    try {
 
-    const file = document.getElementById("attachment").files[0];
+      document.getElementById("submittedBy").value =
+        signedInEmail;
 
-    // =================================================
-    // FILE UPLOAD
-    // =================================================
+      const formData = new FormData(this);
 
-    if (file) {
-      if (!validateFile(file)) {
+      const jsonData = Object.fromEntries(
+        formData.entries()
+      );
+
+      // =================================================
+      // DUPLICATE VALIDATION
+      // =================================================
+
+      if (isDuplicateSubmission(jsonData)) {
+
+        alert(
+          "⚠️ Duplicate entry detected!\n\n" +
+          "This same data has already been submitted."
+        );
+
+        isSubmitting = false;
+        submitButton.disabled = false;
+        submitButton.textContent = "Save";
+
         return;
       }
 
-      // Compress images
-      if (file.type.startsWith("image/")) {
-        const compressed = await compressImage(file);
+      // =================================================
+      // FILE UPLOAD
+      // =================================================
 
-        jsonData.fileName = file.name.replace(
-          /\.[^.]+$/,
-          ".jpg"
-        );
+      const file =
+        document.getElementById("attachment").files[0];
 
-        jsonData.mimeType = "image/jpeg";
+      if (file) {
 
-        jsonData.fileData =
-          await blobToBase64(compressed);
-      } else {
-        // PDF
-        jsonData.fileName = file.name;
+        if (!validateFile(file)) {
 
-        jsonData.mimeType = file.type;
+          isSubmitting = false;
+          submitButton.disabled = false;
+          submitButton.textContent = "Save";
 
-        jsonData.fileData =
-          await blobToBase64(file);
+          return;
+        }
+
+        // Compress images
+        if (file.type.startsWith("image/")) {
+
+          const compressed =
+            await compressImage(file);
+
+          jsonData.fileName =
+            file.name.replace(
+              /\.[^.]+$/,
+              ".jpg"
+            );
+
+          jsonData.mimeType =
+            "image/jpeg";
+
+          jsonData.fileData =
+            await blobToBase64(compressed);
+
+        } else {
+
+          // PDF
+          jsonData.fileName =
+            file.name;
+
+          jsonData.mimeType =
+            file.type;
+
+          jsonData.fileData =
+            await blobToBase64(file);
+        }
       }
-    }
 
-    // =================================================
-    // SEND TO GOOGLE APPS SCRIPT
-    // =================================================
+      // =================================================
+      // SEND TO GOOGLE APPS SCRIPT
+      // =================================================
 
-    try {
-      const response = await fetch(scriptURL, {
-        method: "POST",
-        body: new URLSearchParams(jsonData),
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded",
-        },
-      });
+      const response = await fetch(
+        scriptURL,
+        {
+          method: "POST",
 
-      const resultText = await response.text();
+          body: new URLSearchParams(
+            jsonData
+          ),
+
+          headers: {
+            "Content-Type":
+              "application/x-www-form-urlencoded",
+          },
+        }
+      );
+
+      const resultText =
+        await response.text();
+
+      // =================================================
+      // SUCCESS
+      // =================================================
 
       alert(resultText);
 
@@ -263,7 +355,8 @@ document
       document.getElementById("submittedBy").value =
         signedInEmail;
 
-      document.getElementById("fileInfo").innerHTML = "";
+      document.getElementById("fileInfo").innerHTML =
+        "";
 
       console.log(
         "Submission successful:",
@@ -272,15 +365,29 @@ document
         signedInEmail
       );
 
-      // Reload data
-      fetchData();
-    } catch (err) {
-      console.error("Submission error:", err);
+      // Reload latest data
+      await fetchData();
 
-      alert("❌ Submission failed.");
+    } catch (err) {
+
+      console.error(
+        "Submission error:",
+        err
+      );
+
+      alert(
+        "❌ Submission failed. Please try again."
+      );
+
+    } finally {
+
+      // Unlock button only after request finishes
+      isSubmitting = false;
+
+      submitButton.disabled = false;
+      submitButton.textContent = "Save";
     }
   });
-
 // =====================================================
 // GLOBAL DATA
 // =====================================================
