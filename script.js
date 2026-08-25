@@ -869,6 +869,296 @@ function populateDropdowns(data) {
 }
 
 // =====================================================
+// SHARE DATA TO WHATSAPP
+// =====================================================
+
+document
+  .getElementById("shareWhatsAppBtn")
+  .addEventListener("click", function () {
+
+    // Get currently filtered data
+    const data = allData.filter((row) => {
+
+      const nameInput =
+        document.getElementById("searchByName").value
+          .trim()
+          .toLowerCase();
+
+      const villageInput =
+        normalizeFilterValue(
+          document.getElementById("searchByVillage").value
+        );
+
+      const yearInput =
+        normalizeFilterValue(
+          document.getElementById("searchByYear").value
+        );
+
+      const localInput =
+        normalizeFilterValue(
+          document.getElementById("searchByLocal").value
+        );
+
+      const shopNameInput =
+        normalizeFilterValue(
+          document.getElementById("searchByShopName").value
+        );
+
+      const festivalInput =
+        normalizeFilterValue(
+          document.getElementById("searchByFestival").value
+        );
+
+      const submittedByInput =
+        document.getElementById("searchBySubmittedBy").value
+          .trim()
+          .toLowerCase();
+
+      const typeInput =
+        document.getElementById("searchByType")?.value || "";
+
+      const paymentTypeInput =
+        document.getElementById("searchByPaymentType")?.value || "";
+
+      const amountRange =
+        document.getElementById("searchByAmountRange")?.value || "";
+
+      const name =
+        String(row.name || "").toLowerCase();
+
+      const village =
+        normalizeFilterValue(row.village);
+
+      const year =
+        normalizeFilterValue(row.year);
+
+      const local =
+        normalizeFilterValue(row.local);
+
+      const shopName =
+        normalizeFilterValue(row.local);
+
+      const festival =
+        normalizeFilterValue(row.festival);
+
+      const submittedBy =
+        String(row.submittedBy || "").toLowerCase();
+
+      const amt =
+        parseFloat(row.amount || "0");
+
+      const rowType =
+        String(row.type || "");
+
+      const rowPaymentType =
+        String(row.paymentType || "");
+
+      // Amount range
+      let matchesAmount = true;
+
+      if (amountRange) {
+
+        let min = 0;
+        let max = Infinity;
+
+        if (amountRange.includes("+")) {
+
+          min = parseInt(
+            amountRange.replace("+", ""),
+            10
+          );
+
+        } else if (amountRange.includes("-")) {
+
+          [min, max] =
+            amountRange
+              .split("-")
+              .map(Number);
+        }
+
+        matchesAmount =
+          amt >= min &&
+          amt <= max;
+      }
+
+      return (
+        (!nameInput ||
+          name.includes(nameInput)) &&
+
+        (!villageInput ||
+          village === villageInput) &&
+
+        (!yearInput ||
+          year === yearInput) &&
+
+        (!localInput ||
+          local === localInput) &&
+
+        (!shopNameInput ||
+          (
+            normalizeFilterValue(row.type) === "expense" &&
+            shopName === shopNameInput
+          )) &&
+
+        (!festivalInput ||
+          festival === festivalInput) &&
+
+        (!typeInput ||
+          rowType === typeInput) &&
+
+        (!paymentTypeInput ||
+          rowPaymentType === paymentTypeInput) &&
+
+        (!submittedByInput ||
+          submittedBy.includes(submittedByInput)) &&
+
+        matchesAmount
+      );
+    });
+
+    // No data
+    if (!data.length) {
+      alert(
+        "⚠️ No data available to share.\n\nPlease load some data first."
+      );
+      return;
+    }
+
+    // =================================================
+    // CALCULATE TOTALS
+    // =================================================
+
+    let totalCollection = 0;
+    let totalExpense = 0;
+
+    data.forEach((row) => {
+
+      const amount =
+        parseFloat(row.amount || 0);
+
+      if (isNaN(amount)) {
+        return;
+      }
+
+      const type =
+        String(row.type || "").toLowerCase();
+
+      if (type === "collection") {
+        totalCollection += amount;
+      }
+
+      if (type === "expense") {
+        totalExpense += amount;
+      }
+    });
+
+    const balance =
+      totalCollection - totalExpense;
+
+    // =================================================
+    // FILTER INFORMATION
+    // =================================================
+
+    const festival =
+      document.getElementById("searchByFestival").value;
+
+    const year =
+      document.getElementById("searchByYear").value;
+
+    const village =
+      document.getElementById("searchByVillage").value;
+
+    // =================================================
+    // CREATE WHATSAPP MESSAGE
+    // =================================================
+
+    let message = "";
+
+    message += "🙏 *FESTIVAL BUDGET REPORT* 🙏\n";
+    message += "━━━━━━━━━━━━━━━━━━━━\n";
+
+    if (festival) {
+      message += `🎉 *Festival:* ${festival}\n`;
+    }
+
+    if (year) {
+      message += `📅 *Year:* ${year}\n`;
+    }
+
+    if (village) {
+      message += `📍 *Village:* ${village}\n`;
+    }
+
+    message += "\n";
+
+    message += "💰 *FINANCIAL SUMMARY*\n";
+    message += "━━━━━━━━━━━━━━━━━━━━\n";
+
+    message +=
+      `📥 Collection: ₹${totalCollection.toFixed(2)}\n`;
+
+    message +=
+      `📤 Expense: ₹${totalExpense.toFixed(2)}\n`;
+
+    message +=
+      `${balance >= 0 ? "🟢" : "🔴"} Balance: ₹${Math.abs(balance).toFixed(2)}\n`;
+
+    message += "\n";
+
+    // =================================================
+    // TRANSACTION DETAILS
+    // =================================================
+
+    message += "*TRANSACTION DETAILS*\n";
+    message += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+
+    // Header
+    message +=
+      "*Type, Name, Amount, Local, Village, Payment, Remarks*\n";
+
+    // Data
+    data.forEach((row) => {
+
+      const type =
+        String(row.type || "-");
+
+      const name =
+        String(row.name || "-");
+
+      const amount =
+        parseFloat(row.amount || 0).toFixed(2);
+
+      const local =
+        String(row.local || "-");
+
+      const village =
+        String(row.village || "-");
+
+      const paymentType =
+        String(row.paymentType || "-");
+
+      const remarks =
+        String(row.remarks || "-");
+
+      message +=
+        `${type}, ${name}, ${amount}, ${local}, ${village}, ${paymentType}, ${remarks}\n`;
+    });
+
+    // =================================================
+    // OPEN WHATSAPP
+    // =================================================
+
+    const whatsappURL =
+      "https://wa.me/?text=" +
+      encodeURIComponent(message);
+
+    window.open(
+      whatsappURL,
+      "_blank"
+    );
+  });
+
+// =====================================================
 // FILL SELECT
 // =====================================================
 
