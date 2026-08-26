@@ -871,158 +871,230 @@ function populateDropdowns(data) {
 // =====================================================
 // SHARE DATA TO WHATSAPP
 // =====================================================
+// =====================================================
+// BENGALI FESTIVAL NAME
+// =====================================================
+
+function getBengaliFestival(festival) {
+  switch (normalizeFilterValue(festival)) {
+    case "15th aug":
+      return "১৫ই আগস্ট";
+
+    case "durga puja":
+      return "দুর্গাপূজা";
+
+    case "ras yatra":
+      return "রাসযাত্রা";
+
+    case "saraswathi pooja":
+      return "সরস্বতী পূজা";
+
+    case "holi":
+      return "দোলযাত্রা";
+
+    case "horinam song kirton":
+      return "হরিনাম সংকীর্তন";
+
+    case "bonbibi pooja (mamun)":
+      return "বনবিবি পূজা";
+
+    case "chorok":
+      return "চড়ক";
+
+    default:
+      return festival || "উৎসব";
+  }
+}
+
+
+// =====================================================
+// GET FILTERED DATA FOR WHATSAPP
+// =====================================================
+
+function getWhatsAppFilteredData() {
+
+  const nameInput =
+    document
+      .getElementById("searchByName")
+      .value
+      .trim()
+      .toLowerCase();
+
+  const villageInput =
+    normalizeFilterValue(
+      document.getElementById("searchByVillage").value
+    );
+
+  const yearInput =
+    normalizeFilterValue(
+      document.getElementById("searchByYear").value
+    );
+
+  const localInput =
+    normalizeFilterValue(
+      document.getElementById("searchByLocal").value
+    );
+
+  const shopNameInput =
+    normalizeFilterValue(
+      document.getElementById("searchByShopName").value
+    );
+
+  const festivalInput =
+    normalizeFilterValue(
+      document.getElementById("searchByFestival").value
+    );
+
+  const submittedByInput =
+    document
+      .getElementById("searchBySubmittedBy")
+      .value
+      .trim()
+      .toLowerCase();
+
+  const typeInput =
+    document.getElementById("searchByType")?.value || "";
+
+  const paymentTypeInput =
+    document.getElementById("searchByPaymentType")?.value || "";
+
+  const amountRange =
+    document.getElementById("searchByAmountRange")?.value || "";
+
+
+  return allData.filter((row) => {
+
+    const name =
+      String(row.name || "").toLowerCase();
+
+    const village =
+      normalizeFilterValue(row.village);
+
+    const year =
+      normalizeFilterValue(row.year);
+
+    const local =
+      normalizeFilterValue(row.local);
+
+    const festival =
+      normalizeFilterValue(row.festival);
+
+    const submittedBy =
+      String(row.submittedBy || "").toLowerCase();
+
+    const rowType =
+      String(row.type || "");
+
+    const rowPaymentType =
+      String(row.paymentType || "");
+
+    const amount =
+      parseFloat(row.amount || "0");
+
+
+    // =================================================
+    // AMOUNT RANGE
+    // =================================================
+
+    let matchesAmount = true;
+
+    if (amountRange) {
+
+      let min = 0;
+      let max = Infinity;
+
+      if (amountRange.includes("+")) {
+
+        min = parseInt(
+          amountRange.replace("+", ""),
+          10
+        );
+
+      } else if (amountRange.includes("-")) {
+
+        [min, max] =
+          amountRange
+            .split("-")
+            .map(Number);
+      }
+
+      matchesAmount =
+        amount >= min &&
+        amount <= max;
+    }
+
+
+    // =================================================
+    // FILTER CONDITIONS
+    // =================================================
+
+    return (
+
+      (!nameInput ||
+        name.includes(nameInput)) &&
+
+      (!villageInput ||
+        village === villageInput) &&
+
+      (!yearInput ||
+        year === yearInput) &&
+
+      (!localInput ||
+        local === localInput) &&
+
+      (!shopNameInput ||
+        (
+          normalizeFilterValue(row.type) === "expense" &&
+          local === shopNameInput
+        )) &&
+
+      (!festivalInput ||
+        festival === festivalInput) &&
+
+      (!typeInput ||
+        rowType === typeInput) &&
+
+      (!paymentTypeInput ||
+        rowPaymentType === paymentTypeInput) &&
+
+      (!submittedByInput ||
+        submittedBy.includes(submittedByInput)) &&
+
+      matchesAmount
+    );
+  });
+}
+
+
+// =====================================================
+// SHARE DATA TO WHATSAPP
+// =====================================================
 
 document
   .getElementById("shareWhatsAppBtn")
   .addEventListener("click", function () {
 
-    // Get currently filtered data
-    const data = allData.filter((row) => {
+    // =================================================
+    // GET FILTERED DATA
+    // =================================================
 
-      const nameInput =
-        document.getElementById("searchByName").value
-          .trim()
-          .toLowerCase();
+    const data =
+      getWhatsAppFilteredData();
 
-      const villageInput =
-        normalizeFilterValue(
-          document.getElementById("searchByVillage").value
-        );
 
-      const yearInput =
-        normalizeFilterValue(
-          document.getElementById("searchByYear").value
-        );
+    // =================================================
+    // NO DATA
+    // =================================================
 
-      const localInput =
-        normalizeFilterValue(
-          document.getElementById("searchByLocal").value
-        );
-
-      const shopNameInput =
-        normalizeFilterValue(
-          document.getElementById("searchByShopName").value
-        );
-
-      const festivalInput =
-        normalizeFilterValue(
-          document.getElementById("searchByFestival").value
-        );
-
-      const submittedByInput =
-        document.getElementById("searchBySubmittedBy").value
-          .trim()
-          .toLowerCase();
-
-      const typeInput =
-        document.getElementById("searchByType")?.value || "";
-
-      const paymentTypeInput =
-        document.getElementById("searchByPaymentType")?.value || "";
-
-      const amountRange =
-        document.getElementById("searchByAmountRange")?.value || "";
-
-      const name =
-        String(row.name || "").toLowerCase();
-
-      const village =
-        normalizeFilterValue(row.village);
-
-      const year =
-        normalizeFilterValue(row.year);
-
-      const local =
-        normalizeFilterValue(row.local);
-
-      const shopName =
-        normalizeFilterValue(row.local);
-
-      const festival =
-        normalizeFilterValue(row.festival);
-
-      const submittedBy =
-        String(row.submittedBy || "").toLowerCase();
-
-      const amt =
-        parseFloat(row.amount || "0");
-
-      const rowType =
-        String(row.type || "");
-
-      const rowPaymentType =
-        String(row.paymentType || "");
-
-      // Amount range
-      let matchesAmount = true;
-
-      if (amountRange) {
-
-        let min = 0;
-        let max = Infinity;
-
-        if (amountRange.includes("+")) {
-
-          min = parseInt(
-            amountRange.replace("+", ""),
-            10
-          );
-
-        } else if (amountRange.includes("-")) {
-
-          [min, max] =
-            amountRange
-              .split("-")
-              .map(Number);
-        }
-
-        matchesAmount =
-          amt >= min &&
-          amt <= max;
-      }
-
-      return (
-        (!nameInput ||
-          name.includes(nameInput)) &&
-
-        (!villageInput ||
-          village === villageInput) &&
-
-        (!yearInput ||
-          year === yearInput) &&
-
-        (!localInput ||
-          local === localInput) &&
-
-        (!shopNameInput ||
-          (
-            normalizeFilterValue(row.type) === "expense" &&
-            shopName === shopNameInput
-          )) &&
-
-        (!festivalInput ||
-          festival === festivalInput) &&
-
-        (!typeInput ||
-          rowType === typeInput) &&
-
-        (!paymentTypeInput ||
-          rowPaymentType === paymentTypeInput) &&
-
-        (!submittedByInput ||
-          submittedBy.includes(submittedByInput)) &&
-
-        matchesAmount
-      );
-    });
-
-    // No data
     if (!data.length) {
+
       alert(
-        "⚠️ No data available to share.\n\nPlease load some data first."
+        "No data available to share.\n\nPlease load some data first."
       );
+
       return;
     }
+
 
     // =================================================
     // CALCULATE TOTALS
@@ -1041,7 +1113,7 @@ document
       }
 
       const type =
-        String(row.type || "").toLowerCase();
+        normalizeFilterValue(row.type);
 
       if (type === "collection") {
         totalCollection += amount;
@@ -1052,119 +1124,455 @@ document
       }
     });
 
+
     const balance =
       totalCollection - totalExpense;
+
 
     // =================================================
     // FILTER INFORMATION
     // =================================================
 
-    const festival =
-      document.getElementById("searchByFestival").value;
+    const selectedFestival =
+      document.getElementById(
+        "searchByFestival"
+      ).value;
 
-    const year =
-      document.getElementById("searchByYear").value;
+    const selectedYear =
+      document.getElementById(
+        "searchByYear"
+      ).value;
 
-    const village =
-      document.getElementById("searchByVillage").value;
+    const selectedVillage =
+      document.getElementById(
+        "searchByVillage"
+      ).value;
+
 
     // =================================================
-    // CREATE WHATSAPP MESSAGE
+    // START MESSAGE
     // =================================================
-
-    function getBengaliFestival(festival) {
-      switch (normalizeFilterValue(festival)) {
-        case "15th aug":
-          return "১৫ই আগস্ট";
-
-        case "durga puja":
-          return "দুর্গাপূজা";
-
-        case "ras yatra":
-          return "রাসযাত্রা";
-
-        case "saraswathi pooja":
-          return "সরস্বতী পূজা";
-
-        case "holi":
-          return "দোলযাত্রা";
-
-        case "horinam song kirton":
-          return "হরিনাম সংকীর্তন";
-
-        case "bonbibi pooja (mamun)":
-          return "বনবিবি পূজা";
-
-        case "chorok":
-          return "চড়ক";
-
-        default:
-          return festival || "উৎসব";
-      }
-    }
 
     let message = "";
 
-    const festivalName = getBengaliFestival(festival);
+    const festivalName =
+      getBengaliFestival(selectedFestival);
 
-    message += `*${festivalName} — উৎসবের হিসাব* \n`;
-    message += "━━━━━━━━━━━━━━━━━━━━\n";
-
-
-    message += `*উৎসব:* ${festival}\n`;
-    message += `*বছর:* ${year}\n`;
-    message += `*গ্রাম:* ${village}\n`;
-
-    message += "\n";
-
-    message += "*আর্থিক হিসাব*\n";
-    message += "━━━━━━━━━━━━━━━━━━━━\n";
-
-    message += `মোট সংগ্রহ: ₹${totalCollection.toFixed(2)}\n`;
-    message += `মোট খরচ: ₹${totalExpense.toFixed(2)}\n`;
-
-    message +=
-      `${balance >= 0 ? "+" : "-"} ${balance >= 0 ? "ব্যালেন্স" : "ঘাটতি"}: ₹${Math.abs(balance).toFixed(2)}\n`;
-
-    message += "\n";
 
     // =================================================
-    // TRANSACTION DETAILS
+    // HEADER
     // =================================================
-    
-    message += "*লেনদেনের বিবরণ*\n";
-    message += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 
     message +=
-      "*ধরন | নাম | পরিমাণ | এলাকা | গ্রাম | পেমেন্ট | মন্তব্য*\n";
+      `*${festivalName} — উৎসবের হিসাব*\n`;
 
-    // Data
-    data.forEach((row) => {
+    message +=
+      "━━━━━━━━━━━━━━━━━━━━\n";
 
-      const type =
-        String(row.type || "-");
 
-      const name =
-        String(row.name || "-");
-
-      const amount =
-        parseFloat(row.amount || 0).toFixed(2);
-
-      const local =
-        String(row.local || "-");
-
-      const village =
-        String(row.village || "-");
-
-      const paymentType =
-        String(row.paymentType || "-");
-
-      const remarks =
-        String(row.remarks || "-");
+    if (selectedYear) {
 
       message +=
-        `${type}, ${name}, ${amount}, ${local}, ${village}, ${paymentType}, ${remarks}\n`;
-    });
+        `বছর: ${selectedYear}\n`;
+    }
+
+    if (selectedVillage) {
+
+      message +=
+        `গ্রাম: ${selectedVillage}\n`;
+    }
+
+
+    // =================================================
+    // FINANCIAL SUMMARY
+    // =================================================
+
+    message += "\n";
+
+    message +=
+      "*আর্থিক হিসাব*\n";
+
+    message +=
+      `মোট সংগ্রহ: ₹${totalCollection.toFixed(2)}\n`;
+
+    message +=
+      `মোট খরচ: ₹${totalExpense.toFixed(2)}\n`;
+
+    message +=
+      `${balance >= 0 ? "+" : "-"} ${balance >= 0
+        ? "ব্যালেন্স"
+        : "ঘাটতি"
+      }: ₹${Math.abs(balance).toFixed(2)}\n`;
+
+
+    // =================================================
+    // COLLECTION
+    // =================================================
+
+    const collections =
+      data.filter(
+        row =>
+          normalizeFilterValue(row.type) ===
+          "collection"
+      );
+
+
+    if (collections.length) {
+
+      message += "\n";
+
+      message +=
+        "*সংগ্রহ*\n";
+
+      message +=
+        "━━━━━━━━━━━━━━━━━━━━\n";
+
+      // Header ONLY ONCE
+      message +=
+        "নাম | টাকা\n";
+
+
+      // =================================================
+      // GROUP BY LOCAL
+      // =================================================
+
+      const collectionGroups = {};
+
+      collections.forEach((row) => {
+
+        const local =
+          String(row.local || "-").trim();
+
+        const key =
+          normalizeFilterValue(local);
+
+        if (!collectionGroups[key]) {
+
+          collectionGroups[key] = {
+            name: local,
+            rows: []
+          };
+        }
+
+        collectionGroups[key]
+          .rows
+          .push(row);
+      });
+
+
+      // =================================================
+      // SORT LOCAL A-Z
+      // =================================================
+
+      const sortedCollectionGroups =
+        Object.values(collectionGroups)
+          .sort((a, b) =>
+            a.name.localeCompare(
+              b.name,
+              undefined,
+              {
+                numeric: true,
+                sensitivity: "base"
+              }
+            )
+          );
+
+
+      // =================================================
+      // EACH LOCAL
+      // =================================================
+
+      sortedCollectionGroups.forEach(
+        (group) => {
+
+          message += "\n";
+
+          message +=
+            `*এলাকা: ${group.name}*\n`;
+
+
+          // =================================================
+          // FIND HIGHEST CASH
+          // =================================================
+
+          let highestCash =
+            -1;
+
+          group.rows.forEach((row) => {
+
+            const paymentType =
+              normalizeFilterValue(
+                row.paymentType
+              );
+
+            const amount =
+              parseFloat(
+                row.amount || "0"
+              );
+
+            if (
+              paymentType === "cash" &&
+              !isNaN(amount)
+            ) {
+
+              highestCash =
+                Math.max(
+                  highestCash,
+                  amount
+                );
+            }
+          });
+
+
+          // =================================================
+          // SORT NAME A-Z
+          // =================================================
+
+          group.rows.sort((a, b) => {
+
+            const nameA =
+              String(a.name || "")
+                .trim();
+
+            const nameB =
+              String(b.name || "")
+                .trim();
+
+            return nameA.localeCompare(
+              nameB,
+              undefined,
+              {
+                numeric: true,
+                sensitivity: "base"
+              }
+            );
+          });
+
+
+          // =================================================
+          // LOCAL TOTAL
+          // =================================================
+
+          let localTotal = 0;
+
+
+          // =================================================
+          // ROWS
+          // =================================================
+
+          group.rows.forEach((row) => {
+
+            const name =
+              String(
+                row.name || "-"
+              ).trim();
+
+            const amount =
+              parseFloat(
+                row.amount || "0"
+              );
+
+            if (!isNaN(amount)) {
+              localTotal += amount;
+            }
+
+            const amountText =
+              !isNaN(amount)
+                ? `₹${amount.toFixed(2)}`
+                : "₹0.00";
+
+
+            const isHighestCash =
+              normalizeFilterValue(
+                row.paymentType
+              ) === "cash" &&
+              !isNaN(amount) &&
+              amount === highestCash &&
+              highestCash >= 0;
+
+
+            if (isHighestCash) {
+
+              message +=
+                `*${name} | ${amountText}*\n`;
+
+            } else {
+
+              message +=
+                `${name} | ${amountText}\n`;
+            }
+          });
+
+
+          // =================================================
+          // LOCAL TOTAL
+          // =================================================
+
+          message +=
+            `*মোট সংগ্রহ: ₹${localTotal.toFixed(2)}*\n`;
+        }
+      );
+    }
+
+
+    // =================================================
+    // EXPENSE
+    // =================================================
+
+    const expenses =
+      data.filter(
+        row =>
+          normalizeFilterValue(row.type) ===
+          "expense"
+      );
+
+
+    if (expenses.length) {
+
+      message += "\n";
+
+      message +=
+        "*খরচ*\n";
+
+      message +=
+        "━━━━━━━━━━━━━━━━━━━━\n";
+
+      // Header ONLY ONCE
+      message +=
+        "পণ্য | টাকা\n";
+
+
+      // =================================================
+      // GROUP BY SHOP
+      // =================================================
+
+      const expenseGroups = {};
+
+      expenses.forEach((row) => {
+
+        const shopName =
+          String(row.local || "-").trim();
+
+        const key =
+          normalizeFilterValue(shopName);
+
+        if (!expenseGroups[key]) {
+
+          expenseGroups[key] = {
+            name: shopName,
+            rows: []
+          };
+        }
+
+        expenseGroups[key]
+          .rows
+          .push(row);
+      });
+
+
+      // =================================================
+      // SORT SHOP A-Z
+      // =================================================
+
+      const sortedExpenseGroups =
+        Object.values(expenseGroups)
+          .sort((a, b) =>
+            a.name.localeCompare(
+              b.name,
+              undefined,
+              {
+                numeric: true,
+                sensitivity: "base"
+              }
+            )
+          );
+
+
+      // =================================================
+      // EACH SHOP
+      // =================================================
+
+      sortedExpenseGroups.forEach(
+        (group) => {
+
+          message += "\n";
+
+          message +=
+            `*দোকান: ${group.name}*\n`;
+
+
+          // =================================================
+          // SORT PRODUCT A-Z
+          // =================================================
+
+          group.rows.sort((a, b) => {
+
+            const nameA =
+              String(a.name || "")
+                .trim();
+
+            const nameB =
+              String(b.name || "")
+                .trim();
+
+            return nameA.localeCompare(
+              nameB,
+              undefined,
+              {
+                numeric: true,
+                sensitivity: "base"
+              }
+            );
+          });
+
+
+          // =================================================
+          // SHOP TOTAL
+          // =================================================
+
+          let shopTotal = 0;
+
+
+          // =================================================
+          // PRODUCTS
+          // =================================================
+
+          group.rows.forEach((row) => {
+
+            const product =
+              String(
+                row.name || "-"
+              ).trim();
+
+            const amount =
+              parseFloat(
+                row.amount || "0"
+              );
+
+            if (!isNaN(amount)) {
+              shopTotal += amount;
+            }
+
+            const amountText =
+              !isNaN(amount)
+                ? `₹${amount.toFixed(2)}`
+                : "₹0.00";
+
+            message +=
+              `${product} | ${amountText}\n`;
+          });
+
+
+          // =================================================
+          // SHOP TOTAL
+          // =================================================
+
+          message +=
+            `*মোট খরচ: ₹${shopTotal.toFixed(2)}*\n`;
+        }
+      );
+    }
+
 
     // =================================================
     // OPEN WHATSAPP
