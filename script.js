@@ -176,8 +176,36 @@ window.onload = function () {
     }
   );
 
-  fetchData();
+  // fetchData();
+  fetchCurrentYearData();
 };
+
+async function fetchCurrentYearData() {
+  try {
+    const currentYear = new Date().getFullYear();
+
+    const response = await fetch(
+      `${scriptURL}?action=read&year=${currentYear}`
+    );
+
+    allData = await response.json();
+
+    // Populate dropdowns from current-year data
+    populateDropdowns(allData);
+
+    // Keep table empty initially
+    renderTable([]);
+
+    // Reset totals
+    document.getElementById("totalCollection").textContent = "0.00";
+    document.getElementById("totalExpense").textContent = "0.00";
+    document.getElementById("totalBalance").textContent = "₹0";
+
+  } catch (err) {
+    console.error("Fetching error:", err);
+    alert("❌ Failed to load current year data.");
+  }
+}
 // =====================================================
 // DUPLICATE DATA VALIDATION
 // =====================================================
@@ -366,7 +394,7 @@ document
       );
 
       // Reload latest data
-      await fetchData();
+      await fetchCurrentYearData();
 
     } catch (err) {
 
@@ -398,25 +426,25 @@ let allData = [];
 // FETCH DATA
 // =====================================================
 
-async function fetchData() {
-  try {
-    const response = await fetch(
-      `${scriptURL}?action=read`
-    );
+// async function fetchData() {
+//   try {
+//     const response = await fetch(
+//       `${scriptURL}?action=read`
+//     );
 
-    allData = await response.json();
+//     allData = await response.json();
 
-    // Show all data
-    renderTable(allData);
+//     // Show all data
+//     renderTable(allData);
 
-    // Populate filters
-    populateDropdowns(allData);
-  } catch (err) {
-    console.error("Fetching error:", err);
+//     // Populate filters
+//     populateDropdowns(allData);
+//   } catch (err) {
+//     console.error("Fetching error:", err);
 
-    alert("❌ Failed to load data.");
-  }
-}
+//     alert("❌ Failed to load data.");
+//   }
+// }
 
 // =====================================================
 // RENDER TABLE
@@ -432,16 +460,8 @@ function renderTable(data) {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td style="white-space: nowrap;">
-        ${row.Timestamp || ""}
-      </td>
-
       <td>
         ${row.type || ""}
-      </td>
-
-      <td>
-        ${row.paymentType || ""}
       </td>
 
       <td>
@@ -454,6 +474,10 @@ function renderTable(data) {
 
       <td>
         ${row.local || ""}
+      </td>
+
+      <td>
+        ${row.paymentType || ""}
       </td>
 
       <td>
@@ -474,19 +498,23 @@ function renderTable(data) {
 
       <td>
         ${row.attachment
-        ? `<a
+            ? `<a
                 href="${row.attachment}"
                 target="_blank"
                 style="color: blue; text-decoration: underline;"
               >
                 View
               </a>`
-        : ""
-      }
+            : ""
+          }
       </td>
 
       <td>
         ${row.submittedBy || ""}
+      </td>
+
+      <td style="white-space: nowrap;">
+        ${row.Timestamp || ""}
       </td>
     `;
 
@@ -562,7 +590,7 @@ function applyFilters() {
     const local = normalizeFilterValue(
       row.local
     );
-    
+
     const shopName = normalizeFilterValue(row.local);
 
     const festival = normalizeFilterValue(
@@ -1700,6 +1728,85 @@ document
       clone.style.color = "#000";
 
       clone.style.fontSize = "12px";
+
+      // =================================================
+      // PDF TABLE MODIFICATIONS
+      // Remove Timestamp + Sort Name A-Z
+      // =================================================
+
+      const pdfTable =
+        clone.querySelector("table");
+
+      if (pdfTable) {
+
+        const tbody =
+          pdfTable.querySelector("tbody");
+
+        const rows =
+          Array.from(
+            tbody.querySelectorAll("tr")
+          );
+
+        // -----------------------------------------------
+        // Sort rows by Name A-Z
+        // Name column index = 3
+        // Timestamp = 0
+        // -----------------------------------------------
+
+        rows.sort((a, b) => {
+
+          const nameA =
+            String(
+              a.children[3]?.textContent || ""
+            ).trim();
+
+          const nameB =
+            String(
+              b.children[3]?.textContent || ""
+            ).trim();
+
+          return nameA.localeCompare(
+            nameB,
+            undefined,
+            {
+              numeric: true,
+              sensitivity: "base"
+            }
+          );
+        });
+
+        // Re-append sorted rows
+        rows.forEach((row) => {
+          tbody.appendChild(row);
+        });
+
+
+        // -----------------------------------------------
+        // Remove Timestamp column
+        // Timestamp is column index 0
+        // -----------------------------------------------
+
+        const headerRow =
+          pdfTable.querySelector("thead tr");
+
+        if (headerRow) {
+
+          headerRow.children[0]?.remove(); // Timestamp
+          headerRow.children[8]?.remove(); // Remarks
+          headerRow.children[9]?.remove(); // Attachment
+          headerRow.children[10]?.remove(); // SubmittedBy
+
+        }
+
+        tbody
+          .querySelectorAll("tr")
+          .forEach((row) => {
+            row.children[0]?.remove(); // Timestamp
+            row.children[8]?.remove(); // Remarks
+            row.children[9]?.remove(); // Attachment
+            row.children[10]?.remove(); // SubmittedBy
+          });
+      }
 
       // =================================================
       // TABLE STYLE
